@@ -1,1 +1,2 @@
 # NFL-Data-with-D3.js
+I made this chart using D3.js to illustrate data about NFL teams' wins and losses over time. A main advantage of using D3 (which stands for data driven documents) is that each parameter of the visualization can be expressed as a function of a data attribute. In the chart, the size, color, and position of each bubble are a function of the dataset. The connecting line also adds an interesting layer which shows how older teams don't have every advantage when it comes to a higher winning percentage, although older teams do tend to have more all-time wins.  
