@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>NFL All-Time Team Rankings</title>
+        <script type="text/javascript" src="d3/d3.v3.js"></script>
+        <style type="text/css">   
+        div.tooltip {   
+            position: absolute;           
+            text-align: center;           
+            width: 80px;                  
+            height: 60px;                 
+            padding: 2px;             
+            font: 14px sans-serif;
+            font-weight: bold;        
+            background: lightsteelblue;   
+            border: 0px;      
+            border-radius: 8px;           
+            pointer-events: none;         
+          }
+        .line{
+          fill: none;
+          stroke: blue;
+          stroke-width: 1px;
+          }
+        blockquote {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 21px;
+            font-style: normal;
+            font-variant: normal;
+            font-weight: 400;
+            line-height: 30px;
+          }
+          p { 
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 11px;
+
+          }
+          div {
+              background: lightgrey;
+              width: 1080px;
+
+          }
+        </style>
+    </head>
+    <body>
+        <script>
+//make svg element a multiple of football field dimensions 
+var w = (120*9)
+var h = (53*9)
+var padding = 40
+var formatTime = d3.time.format("%e %B");
+
+var svg = d3.select("body")
+        .append("svg")
+        .attr("width",w)
+        .attr("height",h);
+
+var div = d3.select("body").append("div")   
+    .attr("class", "tooltip")               
+    .style("opacity", 0);
+
+var legendRectSize = 18;
+var legendSpacing = 4;
+
+//set scales 
+
+var xScale = d3.scale.linear()
+            .domain([0,800])
+            .range([padding,(w-padding)]);
+
+var yScale = d3.scale.linear()
+            .domain([0,1000])
+            .range([padding,h-padding]);
+
+var rScale = d3.scale.linear()
+            .domain([0.35,0.6])
+            .range([1,25]);
+
+var colorScale = d3.scale.linear()
+            .domain([0.35,0.6])
+            .range([340,360]);
+
+var saturationScale = d3.scale.linear()
+        .domain([0.35,0.6])
+        .range([20,80]);
+
+//set axis definitions
+ var xAxis = d3.svg.axis()
+            .scale(xScale)
+            .ticks(20)
+            .orient("bottom");
+
+var yAxis = d3.svg.axis()
+            .scale(yScale)
+            .ticks(20)
+            .orient("right");
+
+//define lines 
+
+var line = d3.svg.line()
+    .x(function(d) { return xScale(parseInt(d[2])); })
+    .y(function(d) { return yScale(parseInt(d[3])); });
+
+
+var dataset = [["1","Dallas Cowboys","510","378","6","0.574","1960","894","NFC East"],["2","Chicago Bears","752","563","42","0.570","1920","1357","NFC North"],["3","Green Bay Packers","741","561","37","0.567","1921","1339","NFC North"],["4","Miami Dolphins","443","345","4","0.562","1966","792","AFC East"],["5","Baltimore Ravens","182","143","1","0.560","1996","326","AFC North"],["6","San Francisco 49ers","545","444","14","0.550","1950","1003","NFC West"],["7","New England Patriots","478","395","9","0.547","1960","882","AFC East"],["8","New York Giants","691","581","33","0.542","1925","1305","NFC East"],["9","Denver Broncos","464","400","10","0.537","1960","874","AFC West"],["10","Minnesota Vikings","457","401","10","0.532","1961","868","NFC North"],["11","Oakland Raiders","462","406","11","0.532","1960","879","AFC West"],["12","Indianapolis Colts","508","448","7","0.531","1953","963","AFC South"],["13","Pittsburgh Steelers","618","561","21","0.524","1933","1200","AFC North"],["14","Kansas City Chiefs","432","415","12","0.510","1960","859","AFC West"],["15","Washington Redskins","592","576","27","0.507","1932","1195","NFC East"],["16","Cleveland Browns","469","458","10","0.506","1950","937","AFC North"],["17","San Diego Chargers","428","425","11","0.502","1960","864","AFC West"],["18","St. Louis Rams","552","555","21","0.499","1937","1128","NFC West"],["19","Seattle Seahawks","319","320","0","0.499","1976","639","NFC West"],["20","Philadelphia Eagles","560","594","26","0.486","1933","1180","NFC East"],["21","Tennessee Titans","415","448","6","0.481","1960","869","AFC South"],["22","Carolina Panthers","158","174","1","0.476","1995","333","NFC South"],["23","Buffalo Bills","399","458","8","0.466","1960","865","AFC East"],["24","Jacksonville Jaguars","152","177","0","0.462","1995","329","AFC South"],["25","Detroit Lions","535","637","32","0.458","1930","1204","NFC North"],["26","New York Jets","389","464","8","0.456","1960","861","AFC East"],["27","Cincinnati Bengals","331","408","3","0.448","1968","742","AFC North"],["28","New Orleans Saints","331","418","5","0.442","1967","754","NFC South"],["29","Atlanta Falcons","329","436","6","0.431","1966","771","NFC South"],["30","Houston Texans","90","122","0","0.425","2002","212","AFC South"],["31","Arizona Cardinals","528","729","39","0.422","1920","1296","NFC West"],["32","Tampa Bay Buccaneers","241","385","1","0.385","1976","627","NFC South"]]
+
+//set background color
+svg.append("rect")
+    .attr("width", "100%")
+    .attr("height", "100%")
+    .attr("fill", "rgb(30, 190, 87");
+
+// create the DOM elements
+svg.selectAll("circle")
+        .data(dataset)
+        .enter()
+        .append("circle")
+        .attr("r", function(d){
+          return ((xScale(parseInt(d[2]))+yScale(parseInt(d[3])))/40)
+        })
+        .attr("cx", function(d){
+          return xScale(parseInt(d[2]))
+        })
+        .attr("cy", function(d){
+          return yScale(parseInt(d[3]))
+        })
+        .attr("fill", function(d) {
+                return "hsl(" + colorScale(parseFloat(d[5])) +","+ saturationScale(parseFloat(d[5])) + "%,"+saturationScale(parseFloat(d[5]))+"%)";
+            })
+        .attr("stroke", "black")
+        .on("mouseover", function(d) {      
+            div.transition()        
+                .duration(200)      
+                .style("opacity", .9);      
+            div .html("Rank " +d[0] + "<br/>"  + d[1])  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px");    
+            })                  
+        .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+        });
+
+// add axes
+      svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(10," + (h - padding -5) + ")")
+        .attr("fill", "white")
+        .call(xAxis)
+        .append("text")
+        .attr("x", w/2)
+        .attr("y", padding -2)
+        .style("text-anchor", "middle")
+        .text("Lifetime Number of Games Won")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "20px")
+        .attr("fill", "white");
+
+      svg.append("g")
+        .attr("class", "axis")
+        .attr("fill", "white")
+        .call(yAxis)
+        .append("text")
+        .attr("x", -150)
+        .attr("y", 50)
+        .style("text-anchor", "end")
+        .text("Lifetime Number of Losses")
+        .attr("transform", "rotate(-90)")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "15px")
+        .attr("fill", "white");
+        
+      
+      svg.append("text")
+        .attr("class", "title")
+        .attr("x", 550)
+        .attr("y", 60 )
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "50px")
+        .attr("fill", "white")
+        .attr("text-anchor", "middle")
+        .text("NFL All Time Wins and Losses");
+
+ //add connector lines        
+
+      svg.append("path")
+          .data([dataset])
+          .attr("class", "line")
+          .attr("d", line)
+          .stroke-width();
+
+
+
+      </script>
+<br>
+<div class="container">
+<blockquote>  This graph analyzes the lifetime win/loss results of NFL teams using D3.js. <strong>The lines connect teams sequentially by rank.</strong> The criss-crosses show that there is a <strong>relatively even distribution of newer and older teams</strong> across the percent winning distribution. The lighter the shade within the circle, the higher percentage wins each team has. The larger the bubble, the more overall games the team has played. Hover over circles to see the team names and rank. 
+</blockquote>
+</div>
+<p>
+Chart made with <a href="www.D3js.org">D3.js</a>
+<br>
+Data from <a href="https://en.wikipedia.org/wiki/NFL_win-loss_records">Wikipedia</a>
+<br>
+If chart background is black, please switch to Google Chrome to view. 
+</p>
+   </body>
+</html>     
+
+
+
+
+
